@@ -16,7 +16,7 @@ class MainRenderer : MvseRenderer {
         vm: MvseEventHandler?
     ) {
         when (state) {
-            is MainState.Count -> view.binding.get<ActivityMainBinding>().count = state.count
+            is MainState.Count -> view.binding<ActivityMainBinding>().count = state.count
             is MainState.Clean -> {
                 val a = AnimationUtils.loadAnimation(view.activity(), android.R.anim.fade_out)
                 a.duration = 1000
@@ -31,7 +31,7 @@ class MainRenderer : MvseRenderer {
                     override fun onAnimationStart(p0: Animation?) {
                     }
                 })
-                view.binding.get<ActivityMainBinding>().label.startAnimation(a)
+                view.binding<ActivityMainBinding>().label.startAnimation(a)
             }
         }
     }

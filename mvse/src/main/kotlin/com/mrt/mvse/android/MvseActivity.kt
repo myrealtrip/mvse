@@ -9,8 +9,7 @@ import com.mrt.mvse.core.*
 /**
  * Created by jaehochoe on 2020-01-03.
  */
-abstract class MvseActivity<S : MvseState, E : MvseEvent, SE : MvseSideEffect> :
-    AppCompatActivity(), MvseView<S, E> {
+abstract class MvseActivity<S : MvseState, E : MvseEvent, SE : MvseSideEffect> : AppCompatActivity(), MvseView<S, E> {
 
     private val rendererList: List<MvseRenderer> by lazy {
         val list = (extraRenderer() ?: mutableListOf())
@@ -20,18 +19,18 @@ abstract class MvseActivity<S : MvseState, E : MvseEvent, SE : MvseSideEffect> :
         } ?: list
     }
     abstract val renderer: MvseRenderer?
-    abstract val viewInitializer: MvseViewInitializer?
+    abstract val viewInitializer: MvseViewInitializer<S, E>?
     abstract val vm: MvseVm<S, E, SE>?
-    abstract fun <B : ViewDataBinding, VM : MvseEventHandler> bindingVm(b: B, vm: VM)
+    abstract fun <B : ViewDataBinding, VM : MvseEventHandler> bindingVm(b: B?, vm: VM)
 
-    override val binding: ViewDataBinding by lazy {
-        DataBindingUtil.setContentView<ViewDataBinding>(this, layout)
+    override val binding: ViewDataBinding? by lazy {
+        if (layout > 0) DataBindingUtil.setContentView<ViewDataBinding>(this, layout) else null
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         vm?.let {
-            binding.lifecycleOwner = this
+            binding?.lifecycleOwner = this
             bindingVm(binding, it)
             it.bind(this@MvseActivity)
         }
@@ -48,6 +47,7 @@ abstract class MvseActivity<S : MvseState, E : MvseEvent, SE : MvseSideEffect> :
         vm?.intends(event)
     }
 
+    @Suppress("UNUSED")
     fun extraRenderer(): MutableList<MvseRenderer>? {
         return null
     }

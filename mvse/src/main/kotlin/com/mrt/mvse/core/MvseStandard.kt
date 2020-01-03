@@ -6,7 +6,7 @@ import com.mrt.mvse.android.MvseVm
 /**
  * Created by jaehochoe on 2020-01-03.
  */
-fun <B : ViewDataBinding> ViewDataBinding.get(): B {
+fun <B : ViewDataBinding> ViewDataBinding?.be(): B {
     return this as B
 }
 
