@@ -1,0 +1,2 @@
+include ':sample', ':mvse', ':mvse-repo'
+rootProject.name='mvco project'
