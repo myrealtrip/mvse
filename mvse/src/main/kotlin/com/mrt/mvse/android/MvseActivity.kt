@@ -27,8 +27,12 @@ abstract class MvseActivity<S : MvseState, E : MvseEvent, SE : MvseSideEffect> :
         if (layout > 0) DataBindingUtil.setContentView<ViewDataBinding>(this, layout) else null
     }
 
+    open fun preOnCreate(savedInstanceState: Bundle?) {
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        preOnCreate(savedInstanceState)
         vm?.let {
             binding?.lifecycleOwner = this
             bindingVm(binding, it)
