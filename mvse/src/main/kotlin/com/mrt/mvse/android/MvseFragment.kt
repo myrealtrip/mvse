@@ -31,7 +31,7 @@ abstract class MvseFragment<S : MvseState, E : MvseEvent, SE : MvseSideEffect> :
     abstract val renderer: MvseRenderer?
     abstract val viewInitializer: MvseViewInitializer<S, E>?
     abstract val vm: MvseVm<S, E, SE>?
-    abstract fun <B : ViewDataBinding, VM : MvseEventHandler> bindingVm(b: B?, vm: VM)
+    abstract fun <B : ViewDataBinding, VM : Vm> bindingVm(b: B?, vm: VM)
 
     private lateinit var bindingTemp: ViewDataBinding
     override val binding: ViewDataBinding? by lazyOf(bindingTemp)
@@ -68,7 +68,7 @@ abstract class MvseFragment<S : MvseState, E : MvseEvent, SE : MvseSideEffect> :
     }
 
     override fun intends(event: E) {
-        vm?.intends(event)
+        vm?.intent(event)
     }
 
     @Suppress("UNUSED")

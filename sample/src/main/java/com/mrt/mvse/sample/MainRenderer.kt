@@ -13,7 +13,7 @@ class MainRenderer : MvseRenderer {
     override fun <S : MvseState, E : MvseEvent> render(
         view: MvseView<S, E>,
         state: MvseState,
-        vm: MvseEventHandler?
+        vm: Vm?
     ) {
         when (state) {
             is MainState.Count -> view.binding<ActivityMainBinding>().count = state.count
@@ -25,7 +25,7 @@ class MainRenderer : MvseRenderer {
                     }
 
                     override fun onAnimationEnd(p0: Animation?) {
-                        vm?.intends(MainEvent.OnFinishedCleaning)
+                        vm?.intent(MainEvent.OnFinishedCleaning)
                     }
 
                     override fun onAnimationStart(p0: Animation?) {

@@ -21,7 +21,7 @@ abstract class MvseActivity<S : MvseState, E : MvseEvent, SE : MvseSideEffect> :
     abstract val renderer: MvseRenderer?
     abstract val viewInitializer: MvseViewInitializer<S, E>?
     abstract val vm: MvseVm<S, E, SE>?
-    abstract fun <B : ViewDataBinding, VM : MvseEventHandler> bindingVm(b: B?, vm: VM)
+    abstract fun <B : ViewDataBinding, VM : Vm> bindingVm(b: B?, vm: VM)
 
     override val binding: ViewDataBinding? by lazy {
         if (layout > 0) DataBindingUtil.setContentView<ViewDataBinding>(this, layout) else null
@@ -44,7 +44,7 @@ abstract class MvseActivity<S : MvseState, E : MvseEvent, SE : MvseSideEffect> :
     }
 
     override fun intends(event: E) {
-        vm?.intends(event)
+        vm?.intent(event)
     }
 
     @Suppress("UNUSED")

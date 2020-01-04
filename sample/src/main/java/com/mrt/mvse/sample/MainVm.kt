@@ -50,7 +50,7 @@ class MainVm : MvseVm<MainState, MainEvent, MainSideEffect>() {
 
     private suspend fun autoCountUpAsync(count: Int) = async {
         for (i in 0..count) {
-            mainThread { intends(MainEvent.OnUpCount) }
+            mainThread { intent(MainEvent.OnUpCount) }
             kotlinx.coroutines.delay(1000)
         }
         return@async MainState.Clean

@@ -12,7 +12,8 @@ import kotlin.coroutines.CoroutineContext
 /**
  * Created by jaehochoe on 2020-01-01.
  */
-abstract class MvseVm<S : MvseState, E : MvseEvent, SE : MvseSideEffect> : ViewModel(), CoroutineScope, MvseEventHandler {
+abstract class MvseVm<S : MvseState, E : MvseEvent, SE : MvseSideEffect> : ViewModel(),
+    CoroutineScope, Vm {
 
     abstract val bluePrint: MvcoBluePrint<S, E, SE>
 
@@ -25,25 +26,12 @@ abstract class MvseVm<S : MvseState, E : MvseEvent, SE : MvseSideEffect> : ViewM
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + identifier
 
-    override fun onCleared() {
-        super.onCleared()
-        identifier.cancel()
-        jobs.forEach { job ->
-            job.cancel()
-        }
-    }
-
-    override fun intends(event: Any) {
-        if(typeCheck(event).not()) {
-            Mvse.log("Intent was not MvseEvent")
-            return
-        }
-
-        val transition: MvcoBluePrint.Transition<S, E, SE> = bluePrint.reduce(state, event as E)
+    private fun model(event: E) {
+        val transition: MvcoBluePrint.Transition<S, E, SE> = bluePrint.reduce(state, event)
         Mvse.log("Intent was $transition")
         if (transition is MvcoBluePrint.Transition.Valid) {
             state = transition.toState
-            render(state)
+            view(state)
             transition.sideEffect?.let { sideEffect ->
                 Mvse.log("Transition has side effect $sideEffect")
                 workThread {
@@ -52,14 +40,26 @@ abstract class MvseVm<S : MvseState, E : MvseEvent, SE : MvseSideEffect> : ViewM
                     Mvse.log("Result is $result for $sideEffect")
                     when (result) {
                         is MvseState -> {
-                            mainThread { render(result as S) }
+                            mainThread { view(result as S) }
                         }
                         is MvseEvent -> {
-                            mainThread { intends(result as E) }
+                            mainThread { intent(result as E) }
                         }
                     }
                 }
             }
+        }
+    }
+
+    private fun view(state: S) {
+        this.stateLiveData.value = state
+    }
+
+    override fun intent(event: Any) {
+        if (typeCheck(event)) {
+            model(event as E)
+        } else {
+            Mvse.log("Intent was not MvseEvent")
         }
     }
 
@@ -83,22 +83,25 @@ abstract class MvseVm<S : MvseState, E : MvseEvent, SE : MvseSideEffect> : ViewM
         jobs.add(job)
     }
 
-
-    private fun render(state: S) {
-        this.stateLiveData.value = state
-    }
-
     fun <V : MvseView<S, E>> bind(view: V) {
         if (view is LifecycleOwner) {
             stateLiveData.observe(view, Observer {
-                Mvse.log("View will render by $it")
+                Mvse.log("View will view by $it")
                 view.render(it as S)
             })
-            if(isInitialized.not()) {
+            if (isInitialized.not()) {
                 Mvse.log("Vm has initial state as ${bluePrint.initialState}")
-                render(bluePrint.initialState)
+                view(bluePrint.initialState)
                 isInitialized = true
             }
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        identifier.cancel()
+        jobs.forEach { job ->
+            job.cancel()
         }
     }
 }

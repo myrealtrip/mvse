@@ -4,8 +4,7 @@ import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.ViewModelProviders
 import com.mrt.mvse.android.MvseActivity
 import com.mrt.mvse.android.MvseRenderer
-import com.mrt.mvse.android.MvseViewInitializer
-import com.mrt.mvse.core.MvseEventHandler
+import com.mrt.mvse.core.Vm
 import com.mrt.mvse.core.be
 import com.mrt.mvse.sample.databinding.ActivityMainBinding
 
@@ -21,7 +20,7 @@ class MainActivity : MvseActivity<MainState, MainEvent, MainSideEffect>() {
         ViewModelProviders.of(this).get(MainVm::class.java)
     }
 
-    override fun <B : ViewDataBinding, VM : MvseEventHandler> bindingVm(b: B?, vm: VM) {
+    override fun <B : ViewDataBinding, VM : Vm> bindingVm(b: B?, vm: VM) {
         b?.be<ActivityMainBinding>()?.vm = vm
     }
 }

@@ -3,7 +3,7 @@
     <data>
         <variable
             name="vm"
-            type="com.mrt.mvse.core.MvseEventHandler" />
+            type="com.mrt.mvse.core.Vm" />
     </data>
 
     <FrameLayout
