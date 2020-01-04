@@ -12,7 +12,7 @@ interface MvseView<S: MvseState, E: MvseEvent> {
     val layout: Int
 
     open fun render(state: S)
-    open fun intends(event: E)
+    open fun intent(event: E)
     open fun activity(): AppCompatActivity
 
     fun <B : ViewDataBinding> binding(): B {

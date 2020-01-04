@@ -11,7 +11,7 @@ import com.mrt.mvse.sample.databinding.ActivityMainBinding
 class MainInitView : MvseViewInitializer<MainState, MainEvent> {
     override fun initializeView(view: MvseView<MainState, MainEvent>) {
         view.binding<ActivityMainBinding>().label.setOnLongClickListener {
-            view.intends(MainEvent.OnLongClick)
+            view.intent(MainEvent.OnLongClick)
             true
         }
     }

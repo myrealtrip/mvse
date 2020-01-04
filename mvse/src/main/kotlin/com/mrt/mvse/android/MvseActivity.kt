@@ -43,7 +43,7 @@ abstract class MvseActivity<S : MvseState, E : MvseEvent, SE : MvseSideEffect> :
         }
     }
 
-    override fun intends(event: E) {
+    override fun intent(event: E) {
         vm?.intent(event)
     }
 
