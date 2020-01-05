@@ -32,11 +32,20 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
+            android:id="@+id/btn1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="auto count up"
             android:onClick="@{(v) -> vm.intent(com.mrt.mvse.sample.MainEvent.OnClickLayout.INSTANCE)}"
             app:layout_constraintStart_toStartOf="@id/label"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="finish"
+            android:onClick="@{(v) -> vm.intent(&quot;com.mrt.mvse.sample.MainEvent$OnClickFinish&quot;, ((android.app.Activity)context))}"
+            app:layout_constraintEnd_toStartOf="@id/btn1"
             app:layout_constraintBottom_toBottomOf="parent" />
 
 

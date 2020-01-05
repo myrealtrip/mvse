@@ -1,5 +1,6 @@
 package com.mrt.mvse.sample
 
+import android.app.Activity
 import com.mrt.mvse.core.MvseEvent
 
 /**
@@ -11,4 +12,5 @@ sealed class MainEvent : MvseEvent {
     object OnLongClick : MainEvent()
     object OnFinishedCleaning : MainEvent()
     object OnClickLayout : MainEvent()
+    data class OnClickFinish(val activity: Activity) : MainEvent()
 }

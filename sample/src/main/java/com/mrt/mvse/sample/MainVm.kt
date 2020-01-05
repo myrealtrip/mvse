@@ -27,6 +27,11 @@ class MainVm : MvseVm<MainState, MainEvent, MainSideEffect>() {
                 event<MainEvent.OnClickLayout> {
                     toBe(copy(), MainSideEffect.AutoCountUp(3))
                 }
+                event<MainEvent.OnClickFinish> {
+                    toBeNothing(MainSideEffect.Finish {
+                        it.activity.finish()
+                    })
+                }
             }
 
             state<MainState.Clean> {
@@ -36,12 +41,14 @@ class MainVm : MvseVm<MainState, MainEvent, MainSideEffect>() {
             }
 
             sideEffect<MainSideEffect.AutoCountUp> {
-                when (it.sideEffect) {
-                    is MainSideEffect.AutoCountUp -> {
-                        return@sideEffect autoCountUpAsync((it.sideEffect as MainSideEffect.AutoCountUp).count)
-                    }
-                    else -> Unit
-                }
+                return@sideEffect autoCountUpAsync((it.sideEffect as MainSideEffect.AutoCountUp).count)
+            }
+
+            sideEffect<MainSideEffect.Finish> { transition ->
+                return@sideEffect transition.sideEffect?.let {
+                    it.action()
+                    Unit
+                } ?: Unit
             }
         }
 
