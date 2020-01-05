@@ -34,17 +34,25 @@ abstract class MvseVm<S : MvseState, E : MvseEvent, SE : MvseSideEffect> : ViewM
             view(state)
             transition.sideEffect?.let { sideEffect ->
                 Mvse.log("Transition has side effect $sideEffect")
-                workThread {
-                    val toDo = bluePrint.findSideEffect(sideEffect) ?: return@workThread
-                    val result = toDo(transition).await()
-                    Mvse.log("Result is $result for $sideEffect")
-                    when (result) {
-                        is MvseState -> {
-                            mainThread { view(result as S) }
+                val toDo = bluePrint.findSideEffect(sideEffect) ?: return@model
+                when (sideEffect) {
+                    is DoInWorkThread -> {
+                        Mvse.log("Do in Background: $sideEffect")
+                        workThread {
+                            val result = toDo(transition).await()
+                            Mvse.log("Result is $result for $sideEffect")
+                            when (result) {
+                                is MvseState -> {
+                                    mainThread { view(result as S) }
+                                }
+                                is MvseEvent -> {
+                                    mainThread { intent(result as E) }
+                                }
+                            }
                         }
-                        is MvseEvent -> {
-                            mainThread { intent(result as E) }
-                        }
+                    }
+                    else -> {
+                        mainThread { toDo(transition) }
                     }
                 }
             }
