@@ -35,16 +35,13 @@ class MainVm : MvseVm<MainState, MainEvent, MainSideEffect>() {
                 }
             }
 
-            effect<MainSideEffect.AutoCountUp> {
-                if (it is MvcoBluePrint.Transition.Valid) {
-                    when (it.sideEffect) {
-                        is MainSideEffect.AutoCountUp -> {
-                            return@effect autoCountUpAsync((it.sideEffect as MainSideEffect.AutoCountUp).count)
-                        }
-                        else -> Unit
+            sideEffect<MainSideEffect.AutoCountUp> {
+                when (it.sideEffect) {
+                    is MainSideEffect.AutoCountUp -> {
+                        return@sideEffect autoCountUpAsync((it.sideEffect as MainSideEffect.AutoCountUp).count)
                     }
-                } else
-                    Unit
+                    else -> Unit
+                }
             }
         }
 

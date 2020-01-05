@@ -19,7 +19,7 @@ class MvcoBluePrint<STATE : Any, EVENT : Any, SIDE_EFFECT : Any> constructor(
         }
     }
 
-    fun findSideEffect(sideEffect: SIDE_EFFECT): (suspend (Transition<STATE, EVENT, SIDE_EFFECT>) -> Deferred<Any>)? {
+    fun findSideEffect(sideEffect: SIDE_EFFECT): (suspend (Transition.Valid<STATE, EVENT, SIDE_EFFECT>) -> Deferred<Any>)? {
         return synchronized(this) {
             sideEffect.getSideEffect()
         }
@@ -66,7 +66,7 @@ class MvcoBluePrint<STATE : Any, EVENT : Any, SIDE_EFFECT : Any> constructor(
     data class Graph<STATE : Any, EVENT : Any, SIDE_EFFECT : Any>(
         val initialState: STATE,
         val stateDefinitions: Map<Matcher<STATE, STATE>, State<STATE, EVENT, SIDE_EFFECT>>,
-        val sideEffectDefinitions: Map<Matcher<SIDE_EFFECT, SIDE_EFFECT>, suspend (Transition<STATE, EVENT, SIDE_EFFECT>) -> Deferred<Any>>
+        val sideEffectDefinitions: Map<Matcher<SIDE_EFFECT, SIDE_EFFECT>, suspend (Transition.Valid<STATE, EVENT, SIDE_EFFECT>) -> Deferred<Any>>
     ) {
 
         class State<STATE : Any, EVENT : Any, SIDE_EFFECT : Any> internal constructor() {
@@ -132,17 +132,17 @@ class MvcoBluePrint<STATE : Any, EVENT : Any, SIDE_EFFECT : Any> constructor(
             state(Matcher.eq<STATE, S>(state), init)
         }
 
-        fun <SE : SIDE_EFFECT> effect(
+        fun <SE : SIDE_EFFECT> sideEffect(
             matcher: Matcher<SIDE_EFFECT, SE>,
-            init: suspend (Transition<STATE, EVENT, SE>) -> Any
+            init: suspend (Transition.Valid<STATE, EVENT, SE>) -> Any
         ) {
-            sideEffectDefinitions[matcher] = init as (suspend (Transition<STATE, EVENT, SIDE_EFFECT>) -> Deferred<Any>)
+            sideEffectDefinitions[matcher] = init as (suspend (Transition.Valid<STATE, EVENT, SIDE_EFFECT>) -> Deferred<Any>)
         }
 
-        inline fun <reified SE : SIDE_EFFECT> effect(
-            noinline init: suspend (Transition<STATE, EVENT, SE>) -> Any
+        inline fun <reified SE : SIDE_EFFECT> sideEffect(
+            noinline init: suspend (Transition.Valid<STATE, EVENT, SE>) -> Any
         ) {
-            effect(Matcher.any(), init)
+            sideEffect(Matcher.any(), init)
         }
 
         fun build(): Graph<STATE, EVENT, SIDE_EFFECT> {
