@@ -40,12 +40,12 @@ class MainVm : MvseVm<MainState, MainEvent, MainSideEffect>() {
                 }
             }
 
-            sideEffect<MainSideEffect.AutoCountUp> {
-                return@sideEffect autoCountUpAsync((it.sideEffect as MainSideEffect.AutoCountUp).count)
+            doInBackground<MainSideEffect.AutoCountUp> {
+                return@doInBackground autoCountUpAsync((it.sideEffect as MainSideEffect.AutoCountUp).count)
             }
 
-            sideEffect<MainSideEffect.Finish> { transition ->
-                return@sideEffect transition.sideEffect?.let {
+            doInBackground<MainSideEffect.Finish> { transition ->
+                return@doInBackground transition.sideEffect?.let {
                     it.action()
                     Unit
                 } ?: Unit

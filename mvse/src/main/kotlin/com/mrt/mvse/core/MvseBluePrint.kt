@@ -19,9 +19,15 @@ class MvcoBluePrint<STATE : Any, EVENT : Any, SIDE_EFFECT : Any> constructor(
         }
     }
 
-    fun findSideEffect(sideEffect: SIDE_EFFECT): (suspend (Transition.Valid<STATE, EVENT, SIDE_EFFECT>) -> Deferred<Any>)? {
+    fun findBackgroundSideEffect(sideEffect: SIDE_EFFECT): (suspend (Transition.Valid<STATE, EVENT, SIDE_EFFECT>) -> Deferred<Any>)? {
         return synchronized(this) {
-            sideEffect.getSideEffect()
+            sideEffect.getBackgroundSideEffect()
+        }
+    }
+
+    fun findForegroundSideEffect(sideEffect: SIDE_EFFECT): ((Transition.Valid<STATE, EVENT, SIDE_EFFECT>) -> Any)? {
+        return synchronized(this) {
+            sideEffect.getForegroundSideEffect()
         }
     }
 
@@ -40,7 +46,12 @@ class MvcoBluePrint<STATE : Any, EVENT : Any, SIDE_EFFECT : Any> constructor(
         .map { it.value }
         .firstOrNull() ?: error("Missing definition for state ${this.javaClass.simpleName}!")
 
-    private fun SIDE_EFFECT.getSideEffect() = graph.sideEffectDefinitions
+    private fun SIDE_EFFECT.getBackgroundSideEffect() = graph.doInBackground
+        .filter { it.key.matches(this) }
+        .map { it.value }
+        .firstOrNull()
+
+    private fun SIDE_EFFECT.getForegroundSideEffect() = graph.doInForeground
         .filter { it.key.matches(this) }
         .map { it.value }
         .firstOrNull()
@@ -66,7 +77,8 @@ class MvcoBluePrint<STATE : Any, EVENT : Any, SIDE_EFFECT : Any> constructor(
     data class Graph<STATE : Any, EVENT : Any, SIDE_EFFECT : Any>(
         val initialState: STATE,
         val stateDefinitions: Map<Matcher<STATE, STATE>, State<STATE, EVENT, SIDE_EFFECT>>,
-        val sideEffectDefinitions: Map<Matcher<SIDE_EFFECT, SIDE_EFFECT>, suspend (Transition.Valid<STATE, EVENT, SIDE_EFFECT>) -> Deferred<Any>>
+        val doInBackground: Map<Matcher<SIDE_EFFECT, SIDE_EFFECT>, suspend (Transition.Valid<STATE, EVENT, SIDE_EFFECT>) -> Deferred<Any>>,
+        val doInForeground: Map<Matcher<SIDE_EFFECT, SIDE_EFFECT>, (Transition.Valid<STATE, EVENT, SIDE_EFFECT>) -> Any>
     ) {
 
         class State<STATE : Any, EVENT : Any, SIDE_EFFECT : Any> internal constructor() {
@@ -108,7 +120,8 @@ class MvcoBluePrint<STATE : Any, EVENT : Any, SIDE_EFFECT : Any> constructor(
     ) {
         private var initialState = graph?.initialState
         private val stateDefinitions = LinkedHashMap(graph?.stateDefinitions ?: emptyMap())
-        private val sideEffectDefinitions = LinkedHashMap(graph?.sideEffectDefinitions ?: emptyMap())
+        private val doInBackground = LinkedHashMap(graph?.doInBackground ?: emptyMap())
+        private val doInForeground = LinkedHashMap(graph?.doInForeground ?: emptyMap())
 
         fun initialState(initialState: STATE) {
             this.initialState = initialState
@@ -132,24 +145,39 @@ class MvcoBluePrint<STATE : Any, EVENT : Any, SIDE_EFFECT : Any> constructor(
             state(Matcher.eq<STATE, S>(state), init)
         }
 
-        fun <SE : SIDE_EFFECT> sideEffect(
+        fun <SE : SIDE_EFFECT> doInBackground(
             matcher: Matcher<SIDE_EFFECT, SE>,
             init: suspend (Transition.Valid<STATE, EVENT, SE>) -> Any
         ) {
-            sideEffectDefinitions[matcher] = init as (suspend (Transition.Valid<STATE, EVENT, SIDE_EFFECT>) -> Deferred<Any>)
+            doInBackground[matcher] =
+                init as (suspend (Transition.Valid<STATE, EVENT, SIDE_EFFECT>) -> Deferred<Any>)
         }
 
-        inline fun <reified SE : SIDE_EFFECT> sideEffect(
+        inline fun <reified SE : SIDE_EFFECT> doInBackground(
             noinline init: suspend (Transition.Valid<STATE, EVENT, SE>) -> Any
         ) {
-            sideEffect(Matcher.any(), init)
+            doInBackground(Matcher.any(), init)
+        }
+
+        fun <SE : SIDE_EFFECT> doInForeground(
+            matcher: Matcher<SIDE_EFFECT, SE>,
+            init: (Transition.Valid<STATE, EVENT, SE>) -> Any
+        ) {
+            doInForeground[matcher] = init as (Transition.Valid<STATE, EVENT, SIDE_EFFECT>) -> Any
+        }
+
+        inline fun <reified SE : SIDE_EFFECT> doInBackground(
+            noinline init: (Transition.Valid<STATE, EVENT, SE>) -> Any
+        ) {
+            doInForeground(Matcher.any(), init)
         }
 
         fun build(): Graph<STATE, EVENT, SIDE_EFFECT> {
             return Graph(
                 requireNotNull(initialState),
                 stateDefinitions.toMap(),
-                sideEffectDefinitions.toMap()
+                doInBackground.toMap(),
+                doInForeground.toMap()
             )
         }
 
