@@ -83,7 +83,7 @@ abstract class MvseVm<S : MvseState, E : MvseEvent, SE : MvseSideEffect> : ViewM
         jobs.add(job)
     }
 
-    private fun workThread(block: suspend () -> Unit) {
+    protected fun workThread(block: suspend () -> Unit) {
         val job = launch(Dispatchers.Main) {
             block()
         }
