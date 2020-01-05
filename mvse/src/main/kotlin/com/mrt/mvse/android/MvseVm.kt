@@ -40,7 +40,7 @@ abstract class MvseVm<S : MvseState, E : MvseEvent, SE : MvseSideEffect> : ViewM
                         val toDo = bluePrint.findBackgroundSideEffect(sideEffect) ?: return@model
                         Mvse.log("Do in Background: $sideEffect")
                         workThread {
-                            result = toDo(transition).await()
+                            result = toDo(transition)?.await()
                             Mvse.log("Result is $result for $sideEffect")
                         }
                     }

@@ -19,7 +19,7 @@ class MvcoBluePrint<STATE : Any, EVENT : Any, SIDE_EFFECT : Any> constructor(
         }
     }
 
-    fun findBackgroundSideEffect(sideEffect: SIDE_EFFECT): (suspend (Transition.Valid<STATE, EVENT, SIDE_EFFECT>) -> Deferred<Any?>)? {
+    fun findBackgroundSideEffect(sideEffect: SIDE_EFFECT): (suspend (Transition.Valid<STATE, EVENT, SIDE_EFFECT>) -> Deferred<Any?>?)? {
         return synchronized(this) {
             sideEffect.getBackgroundSideEffect()
         }
@@ -77,7 +77,7 @@ class MvcoBluePrint<STATE : Any, EVENT : Any, SIDE_EFFECT : Any> constructor(
     data class Graph<STATE : Any, EVENT : Any, SIDE_EFFECT : Any>(
         val initialState: STATE,
         val stateDefinitions: Map<Matcher<STATE, STATE>, State<STATE, EVENT, SIDE_EFFECT>>,
-        val doInBackground: Map<Matcher<SIDE_EFFECT, SIDE_EFFECT>, suspend (Transition.Valid<STATE, EVENT, SIDE_EFFECT>) -> Deferred<Any?>>,
+        val doInBackground: Map<Matcher<SIDE_EFFECT, SIDE_EFFECT>, suspend (Transition.Valid<STATE, EVENT, SIDE_EFFECT>) -> Deferred<Any?>?>,
         val doInForeground: Map<Matcher<SIDE_EFFECT, SIDE_EFFECT>, (Transition.Valid<STATE, EVENT, SIDE_EFFECT>) -> Any?>
     ) {
 
@@ -145,31 +145,31 @@ class MvcoBluePrint<STATE : Any, EVENT : Any, SIDE_EFFECT : Any> constructor(
             state(Matcher.eq<STATE, S>(state), init)
         }
 
-        fun <SE : SIDE_EFFECT> doInBackground(
+        fun <SE : SIDE_EFFECT> sideEffectOnBackground(
             matcher: Matcher<SIDE_EFFECT, SE>,
-            init: suspend (Transition.Valid<STATE, EVENT, SE>) -> Deferred<Any?>
+            init: suspend (Transition.Valid<STATE, EVENT, SE>) -> Deferred<Any?>?
         ) {
             doInBackground[matcher] =
-                init as (suspend (Transition.Valid<STATE, EVENT, SIDE_EFFECT>) -> Deferred<Any?>)
+                init as (suspend (Transition.Valid<STATE, EVENT, SIDE_EFFECT>) -> Deferred<Any?>)?
         }
 
-        inline fun <reified SE : SIDE_EFFECT> doInBackground(
-            noinline init: suspend (Transition.Valid<STATE, EVENT, SE>) -> Deferred<Any?>
+        inline fun <reified SE : SIDE_EFFECT> sideEffectOnBackground(
+            noinline init: suspend (Transition.Valid<STATE, EVENT, SE>) -> Deferred<Any?>?
         ) {
-            doInBackground(Matcher.any(), init)
+            sideEffectOnBackground(Matcher.any(), init)
         }
 
-        fun <SE : SIDE_EFFECT> doInForeground(
+        fun <SE : SIDE_EFFECT> sideEffect(
             matcher: Matcher<SIDE_EFFECT, SE>,
             init: (Transition.Valid<STATE, EVENT, SE>) -> Any?
         ) {
             doInForeground[matcher] = init as (Transition.Valid<STATE, EVENT, SIDE_EFFECT>) -> Any?
         }
 
-        inline fun <reified SE : SIDE_EFFECT> doInForeground(
+        inline fun <reified SE : SIDE_EFFECT> sideEffect(
             noinline init: (Transition.Valid<STATE, EVENT, SE>) -> Any?
         ) {
-            doInForeground(Matcher.any(), init)
+            sideEffect(Matcher.any(), init)
         }
 
         fun build(): Graph<STATE, EVENT, SIDE_EFFECT> {
