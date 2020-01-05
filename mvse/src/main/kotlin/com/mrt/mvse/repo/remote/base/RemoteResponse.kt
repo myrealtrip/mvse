@@ -28,7 +28,7 @@ inline fun <T> RemoteResponse<T>.onComplete(block: (RemoteResponse<T>) -> Unit):
 }
 
 
-inline fun <T, R> RemoteResponse<T>.onComplete(block: (RemoteResponse<T>) -> R): R? {
+inline fun <T, R> RemoteResponse<T>.onCompleted(block: (RemoteResponse<T>) -> R): R? {
     return block(this)
 }
 
@@ -38,7 +38,7 @@ inline fun <T> RemoteResponse<T>.onSuccess(block: (T) -> Unit): RemoteResponse<T
 }
 
 
-inline fun <T, R> RemoteResponse<T>.onSuccess(block: (T) -> R): R? {
+inline fun <T, R> RemoteResponse<T>.onSuccessed(block: (T) -> R): R? {
     if (isSuccess) return block(data)
     return null
 }
@@ -48,7 +48,7 @@ inline fun <T> RemoteResponse<T>.onFail(block: (RemoteResponse<T>) -> Unit): Rem
     return this
 }
 
-inline fun <T, R> RemoteResponse<T>.onFail(block: (RemoteResponse<T>) -> R): R? {
+inline fun <T, R> RemoteResponse<T>.onFailed(block: (RemoteResponse<T>) -> R): R? {
     if (!isSuccess) return block(this)
     return null
 }
