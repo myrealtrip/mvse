@@ -166,7 +166,7 @@ class MvcoBluePrint<STATE : Any, EVENT : Any, SIDE_EFFECT : Any> constructor(
             doInForeground[matcher] = init as (Transition.Valid<STATE, EVENT, SIDE_EFFECT>) -> Any?
         }
 
-        inline fun <reified SE : SIDE_EFFECT> doInBackground(
+        inline fun <reified SE : SIDE_EFFECT> doInForeground(
             noinline init: (Transition.Valid<STATE, EVENT, SE>) -> Any?
         ) {
             doInForeground(Matcher.any(), init)
