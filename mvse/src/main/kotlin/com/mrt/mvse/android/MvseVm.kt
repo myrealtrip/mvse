@@ -5,7 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import com.mrt.mvse.core.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
 
@@ -13,7 +16,7 @@ import kotlin.coroutines.CoroutineContext
  * Created by jaehochoe on 2020-01-01.
  */
 abstract class MvseVm<S : MvseState, E : MvseEvent, SE : MvseSideEffect> : ViewModel(),
-    CoroutineScope, Vm {
+        CoroutineScope, Vm {
 
     abstract val bluePrint: MvcoBluePrint<S, E, SE>
 
@@ -42,24 +45,26 @@ abstract class MvseVm<S : MvseState, E : MvseEvent, SE : MvseSideEffect> : ViewM
                         workThread {
                             result = toDo(transition)?.await()
                             Mvse.log("Result is $result for $sideEffect")
-                            onResult(result)
+                            handleResult(result)
                         }
                     }
                     else -> {
                         val toDo = bluePrint.findForegroundSideEffect((sideEffect)) ?: return@model
+                        Mvse.log("Do in Foreground: $sideEffect")
                         result = toDo(transition)
                         Mvse.log("Result is $result for $sideEffect")
-                        onResult(result)
+                        handleResult(result)
                     }
                 }
             }
         }
     }
 
-    private fun onResult(result: Any?) {
+    private fun handleResult(result: Any?) {
         when (result) {
             is MvseState -> {
-                mainThread { view(result as S) }
+                this.state = result as S
+                mainThread { view(this.state) }
             }
             is MvseEvent -> {
                 mainThread { intent(result as E) }
