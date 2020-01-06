@@ -43,13 +43,6 @@ class MainVm : MvseVm<MainState, MainEvent, MainSideEffect>() {
             sideEffectOnBackground<MainSideEffect.AutoCountUp> {
                 return@sideEffectOnBackground autoCountUpAsync((it.sideEffect as MainSideEffect.AutoCountUp).count)
             }
-
-            sideEffectOnBackground<MainSideEffect.Finish> { transition ->
-                return@sideEffectOnBackground transition.sideEffect?.let {
-                    it.action()
-                    Unit
-                } ?: Unit
-            }
         }
 
     private suspend fun autoCountUpAsync(count: Int) = async {

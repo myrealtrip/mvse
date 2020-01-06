@@ -15,6 +15,10 @@ android {
     }
 }
 
-apply from : '../android.gradle'
+if(rootProject.ext.customAndroidGradle == null)
+    apply from : '../android.gradle'
+else
+    apply from : rootProject.ext.customAndroidGradle
+
 apply from : '../conf-dependencies.gradle'
 apply from : '../conf-dependencies-test.gradle'
