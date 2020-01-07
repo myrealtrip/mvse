@@ -8,6 +8,7 @@ import java.io.IOException
  * Created by jaehochoe on 2019-09-25.
  */
 const val IO_EXCEPTION = 5000
+const val UNKNOWN_EXCEPTION = 5001
 
 abstract class RemoteExecutor : Executor {
     override suspend fun <T> execute(remoteRequest: RemoteRequest<Convertible<T>>): RemoteResponse<T> {

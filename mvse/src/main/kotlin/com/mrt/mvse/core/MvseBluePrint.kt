@@ -65,7 +65,7 @@ class MvcoBluePrint<STATE : Any, EVENT : Any, SIDE_EFFECT : Any> constructor(
             override val fromState: STATE,
             override val event: EVENT,
             val toState: STATE,
-            val sideEffect: SIDE_EFFECT?
+            val sideEffect: SIDE_EFFECT
         ) : Transition<STATE, EVENT, SIDE_EFFECT>()
 
         data class Invalid<out STATE : Any, out EVENT : Any, out SIDE_EFFECT : Any> internal constructor(
@@ -87,7 +87,7 @@ class MvcoBluePrint<STATE : Any, EVENT : Any, SIDE_EFFECT : Any> constructor(
 
             data class TransitionTo<out STATE : Any, out SIDE_EFFECT : Any> internal constructor(
                 val toState: STATE,
-                val sideEffect: SIDE_EFFECT?
+                val sideEffect: SIDE_EFFECT
             )
         }
     }
@@ -145,31 +145,30 @@ class MvcoBluePrint<STATE : Any, EVENT : Any, SIDE_EFFECT : Any> constructor(
             state(Matcher.eq<STATE, S>(state), init)
         }
 
-        fun <SE : SIDE_EFFECT> sideEffectOnBackground(
+        fun <SE : SIDE_EFFECT> workInBackground(
             matcher: Matcher<SIDE_EFFECT, SE>,
             init: suspend (Transition.Valid<STATE, EVENT, SE>) -> Deferred<Any?>?
         ) {
-            doInBackground[matcher] =
-                init as (suspend (Transition.Valid<STATE, EVENT, SIDE_EFFECT>) -> Deferred<Any?>)?
+            doInBackground[matcher] = init as (suspend (Transition.Valid<STATE, EVENT, SIDE_EFFECT>) -> Deferred<Any?>)
         }
 
-        inline fun <reified SE : SIDE_EFFECT> sideEffectOnBackground(
+        inline fun <reified SE : SIDE_EFFECT> workInBackground(
             noinline init: suspend (Transition.Valid<STATE, EVENT, SE>) -> Deferred<Any?>?
         ) {
-            sideEffectOnBackground(Matcher.any(), init)
+            workInBackground(Matcher.any(), init)
         }
 
-        fun <SE : SIDE_EFFECT> sideEffect(
+        fun <SE : SIDE_EFFECT> work(
             matcher: Matcher<SIDE_EFFECT, SE>,
             init: (Transition.Valid<STATE, EVENT, SE>) -> Any?
         ) {
             doInForeground[matcher] = init as (Transition.Valid<STATE, EVENT, SIDE_EFFECT>) -> Any?
         }
 
-        inline fun <reified SE : SIDE_EFFECT> sideEffect(
+        inline fun <reified SE : SIDE_EFFECT> work(
             noinline init: (Transition.Valid<STATE, EVENT, SE>) -> Any?
         ) {
-            sideEffect(Matcher.any(), init)
+            work(Matcher.any(), init)
         }
 
         fun build(): Graph<STATE, EVENT, SIDE_EFFECT> {
@@ -216,7 +215,7 @@ class MvcoBluePrint<STATE : Any, EVENT : Any, SIDE_EFFECT : Any> constructor(
 
             @Suppress("UNUSED") // The unused warning is probably a compiler bug.
             fun S.toBe(state: STATE, sideEffect: SIDE_EFFECT? = null) =
-                Graph.State.TransitionTo(state, sideEffect)
+                Graph.State.TransitionTo(state, sideEffect ?: VoidSideEffect as SIDE_EFFECT)
 
             @Suppress("UNUSED") // The unused warning is probably a compiler bug.
             fun S.toBeNothing(sideEffect: SIDE_EFFECT? = null) = toBe(this, sideEffect)

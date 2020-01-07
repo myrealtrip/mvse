@@ -38,8 +38,18 @@ abstract class MvseVm<S : MvseState, E : MvseEvent, SE : MvseSideEffect> : ViewM
             transition.sideEffect?.let { sideEffect ->
                 Mvse.log("Transition has side effect $sideEffect")
                 var result: Any? = null
-                when (sideEffect) {
-                    is DoInWorkThread -> {
+                var doInBackground = false
+                var toDo: Any? = bluePrint.findForegroundSideEffect(sideEffect)
+                if (toDo == null) {
+                    toDo = bluePrint.findBackgroundSideEffect(sideEffect)
+
+                    if (toDo == null)
+                        return@model
+                    else
+                        doInBackground = true
+                }
+                when (doInBackground) {
+                    true -> {
                         val toDo = bluePrint.findBackgroundSideEffect(sideEffect) ?: return@model
                         Mvse.log("Do in Background: $sideEffect")
                         workThread {

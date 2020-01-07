@@ -38,7 +38,7 @@ inline fun <T> RemoteResponse<T>.onSuccess(block: (T) -> Unit): RemoteResponse<T
 }
 
 
-inline fun <T, R> RemoteResponse<T>.onSuccessed(block: (T) -> R): R? {
+inline fun <T, R> RemoteResponse<T>.onSucceed(block: (T) -> R): R? {
     if (isSuccess) return block(data)
     return null
 }
