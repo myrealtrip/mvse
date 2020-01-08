@@ -1,17 +1,17 @@
 package com.mrt.mvse.android
 
 import com.mrt.mvse.core.MvseEvent
-import com.mrt.mvse.core.Vm
 import com.mrt.mvse.core.MvseState
 import com.mrt.mvse.core.MvseView
+import com.mrt.mvse.core.Vm
 
 /**
  * Created by jaehochoe on 2020-01-03.
  */
-interface MvseRenderer {
-    fun <S : MvseState, E : MvseEvent> render(
+interface MvseRenderer<S : MvseState, E : MvseEvent> {
+    fun render(
         view: MvseView<S, E>,
-        state: MvseState,
+        state: S,
         handler: Vm?
     )
 }

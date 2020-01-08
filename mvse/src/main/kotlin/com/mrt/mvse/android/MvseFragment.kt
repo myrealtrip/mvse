@@ -20,7 +20,7 @@ abstract class MvseFragment<S : MvseState, E : MvseEvent, SE : MvseSideEffect> :
     abstract val isNeedLazyLoading: Boolean
     private var isBound = false
 
-    private val rendererList: List<MvseRenderer> by lazy {
+    private val rendererList: List<MvseRenderer<S, E>> by lazy {
         val list = (extraRenderer() ?: mutableListOf())
         renderer?.let {
             list.add(0, it)
@@ -28,12 +28,16 @@ abstract class MvseFragment<S : MvseState, E : MvseEvent, SE : MvseSideEffect> :
         } ?: list
     }
 
-    abstract val renderer: MvseRenderer?
+    abstract val renderer: MvseRenderer<S, E>?
+
     abstract val viewInitializer: MvseViewInitializer<S, E>?
+
     abstract val vm: MvseVm<S, E, SE>?
+
     abstract fun <B : ViewDataBinding, VM : Vm> bindingVm(b: B?, vm: VM)
 
     private lateinit var bindingTemp: ViewDataBinding
+
     override val binding: ViewDataBinding? by lazyOf(bindingTemp)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -47,7 +51,7 @@ abstract class MvseFragment<S : MvseState, E : MvseEvent, SE : MvseSideEffect> :
                     isBound = true
                 }
             }
-            viewInitializer?.initializeView(this)
+            viewInitializer?.initializeView(this, vm)
             binding?.root
         } else
             super.onCreateView(inflater, container, savedInstanceState)
@@ -72,7 +76,7 @@ abstract class MvseFragment<S : MvseState, E : MvseEvent, SE : MvseSideEffect> :
     }
 
     @Suppress("UNUSED")
-    fun extraRenderer(): MutableList<MvseRenderer>? {
+    fun extraRenderer(): MutableList<MvseRenderer<S, E>>? {
         return null
     }
 

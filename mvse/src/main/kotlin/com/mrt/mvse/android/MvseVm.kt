@@ -1,5 +1,6 @@
 package com.mrt.mvse.android
 
+import android.content.Intent
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -87,7 +88,7 @@ abstract class MvseVm<S : MvseState, E : MvseEvent, SE : MvseSideEffect> : ViewM
     }
 
     override fun intent(event: Any) {
-        if (typeCheck(event)) {
+        if (isValidEvent(event)) {
             model(event as E)
         } else {
             Mvse.log("Intent was not MvseEvent")
@@ -134,5 +135,8 @@ abstract class MvseVm<S : MvseState, E : MvseEvent, SE : MvseSideEffect> : ViewM
         jobs.forEach { job ->
             job.cancel()
         }
+    }
+
+    open fun onActivityResult(activity: MvseActivity<S, E, SE>, requestCode: Int, resultCode: Int, data: Intent?) {
     }
 }

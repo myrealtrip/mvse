@@ -10,7 +10,7 @@ fun <B : ViewDataBinding> ViewDataBinding?.be(): B {
     return this as B
 }
 
-fun <S : MvseState, E : MvseEvent, SE : MvseSideEffect> MvseVm<S, E, SE>.typeCheck(event: Any) : Boolean {
+fun <S : MvseState, E : MvseEvent, SE : MvseSideEffect> MvseVm<S, E, SE>.isValidEvent(event: Any) : Boolean {
     if(event !is MvseEvent)
         return false
 
