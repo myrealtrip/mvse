@@ -22,7 +22,10 @@ abstract class MvseVm<S : MvseState, E : MvseEvent, SE : MvseSideEffect> : ViewM
     abstract val bluePrint: MvcoBluePrint<S, E, SE>
 
     private var isInitialized = false
-    protected var state: S = bluePrint.initialState
+    private var stateInternal: S = bluePrint.initialState
+    protected val state: S
+        get() = stateInternal
+
     private val stateLiveData = MutableLiveData<MvseState>()
     private val identifier = Job()
     private val jobs = mutableListOf<Job>()
@@ -31,11 +34,11 @@ abstract class MvseVm<S : MvseState, E : MvseEvent, SE : MvseSideEffect> : ViewM
         get() = Dispatchers.Main + identifier
 
     private fun model(event: E) {
-        val transition: MvcoBluePrint.Transition<S, E, SE> = bluePrint.reduce(state, event)
+        val transition: MvcoBluePrint.Transition<S, E, SE> = bluePrint.reduce(stateInternal, event)
         Mvse.log("Intent was $transition")
         if (transition is MvcoBluePrint.Transition.Valid) {
-            state = transition.toState
-            view(state)
+            stateInternal = transition.toState
+            view(stateInternal)
             transition.sideEffect?.let { sideEffect ->
                 Mvse.log("Transition has side effect $sideEffect")
                 var result: Any? = null
@@ -74,8 +77,8 @@ abstract class MvseVm<S : MvseState, E : MvseEvent, SE : MvseSideEffect> : ViewM
     private fun handleResult(result: Any?) {
         when (result) {
             is MvseState -> {
-                this.state = result as S
-                mainThread { view(this.state) }
+                this.stateInternal = result as S
+                mainThread { view(this.stateInternal) }
             }
             is MvseEvent -> {
                 mainThread { intent(result as E) }
