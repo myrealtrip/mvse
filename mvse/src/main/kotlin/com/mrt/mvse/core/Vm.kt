@@ -17,6 +17,7 @@ interface Vm {
                         )
                     )
                 } catch (e: Exception) {
+                    Mvse.log(e)
                 }
             }
         }
