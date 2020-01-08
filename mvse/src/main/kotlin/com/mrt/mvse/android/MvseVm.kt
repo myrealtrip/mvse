@@ -22,7 +22,7 @@ abstract class MvseVm<S : MvseState, E : MvseEvent, SE : MvseSideEffect> : ViewM
     abstract val bluePrint: MvcoBluePrint<S, E, SE>
 
     private var isInitialized = false
-    private var state: S = bluePrint.initialState
+    protected var state: S = bluePrint.initialState
     private val stateLiveData = MutableLiveData<MvseState>()
     private val identifier = Job()
     private val jobs = mutableListOf<Job>()
