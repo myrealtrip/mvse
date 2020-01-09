@@ -10,8 +10,8 @@ import com.mrt.mvse.core.Vm
  */
 interface MvseRenderer<S : MvseState, E : MvseEvent> {
     fun render(
-        view: MvseView<S, E>,
-        state: S,
-        handler: Vm?
+            v: MvseView<S, E>,
+            s: S,
+            vm: Vm?
     )
 }

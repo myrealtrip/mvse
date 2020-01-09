@@ -9,5 +9,5 @@ import com.mrt.mvse.core.Vm
  * Created by jaehochoe on 2020-01-03.
  */
 interface MvseViewInitializer<S : MvseState, E : MvseEvent> {
-    fun initializeView(view: MvseView<S, E>, vm: Vm?)
+    fun initializeView(v: MvseView<S, E>, vm: Vm?)
 }
