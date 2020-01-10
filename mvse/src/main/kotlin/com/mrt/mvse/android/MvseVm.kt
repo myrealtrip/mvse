@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import com.mrt.mvse.core.*
+import com.mrt.v12.event.InAppEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -142,4 +143,12 @@ abstract class MvseVm<S : MvseState, E : MvseEvent, SE : MvseSideEffect> : ViewM
 
     open fun onActivityResult(activity: MvseActivity<S, E, SE>, requestCode: Int, resultCode: Int, data: Intent?) {
     }
+
+    open fun subjects(): Array<Int>? {
+        return null
+    }
+
+    open fun onSubscribe(inAppEvent: InAppEvent) {
+    }
+
 }

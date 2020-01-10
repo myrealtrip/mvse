@@ -5,7 +5,10 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
+import androidx.lifecycle.Observer
 import com.mrt.mvse.core.*
+import com.mrt.v12.event.EventBus
+import com.mrt.v12.event.InAppEvent
 
 /**
  * Created by jaehochoe on 2020-01-03.
@@ -43,6 +46,14 @@ abstract class MvseActivity<S : MvseState, E : MvseEvent, SE : MvseSideEffect> :
             it.bind(this@MvseActivity)
         }
         viewInitializer?.initializeView(this, vm)
+
+        subjects()?.let { subjects ->
+            subjects.forEach {
+                EventBus.subscribe(it, this@MvseActivity, Observer { inAppEvent ->
+                    onSubscribe(inAppEvent)
+                })
+            }
+        }
     }
 
     override fun render(state: S) {
@@ -67,5 +78,13 @@ abstract class MvseActivity<S : MvseState, E : MvseEvent, SE : MvseSideEffect> :
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         vm?.onActivityResult(this, requestCode, resultCode, data)
+    }
+
+    private fun subjects(): Array<Int>? {
+        return vm?.subjects()
+    }
+
+    private fun onSubscribe(inAppEvent: InAppEvent) {
+        vm?.onSubscribe(inAppEvent)
     }
 }
