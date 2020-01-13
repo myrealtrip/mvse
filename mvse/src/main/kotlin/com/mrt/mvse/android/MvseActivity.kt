@@ -6,9 +6,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.Observer
+import com.mrt.mvse.android.event.InAppEvent
 import com.mrt.mvse.core.*
 import com.mrt.v12.event.EventBus
-import com.mrt.v12.event.InAppEvent
 
 /**
  * Created by jaehochoe on 2020-01-03.

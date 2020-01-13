@@ -1,4 +1,4 @@
-package com.mrt.v12.event
+package com.mrt.mvse.android.event
 
 /**
  * Created by jaehochoe on 2019-09-26.

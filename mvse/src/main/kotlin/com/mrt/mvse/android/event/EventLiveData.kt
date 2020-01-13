@@ -2,6 +2,7 @@ package com.mrt.v12.event
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
+import com.mrt.mvse.android.event.InAppEvent
 
 /**
  * Created by jaehochoe on 2019-09-26.

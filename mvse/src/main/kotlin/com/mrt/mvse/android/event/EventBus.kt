@@ -4,6 +4,7 @@ import android.util.SparseArray
 import androidx.annotation.NonNull
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
+import com.mrt.mvse.android.event.InAppEvent
 
 /**
  * Created by jaehochoe on 2019-09-26.
