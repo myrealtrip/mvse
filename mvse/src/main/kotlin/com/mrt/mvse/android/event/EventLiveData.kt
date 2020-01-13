@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData
 /**
  * Created by jaehochoe on 2019-09-26.
  */
-class EventLiveData(@EventSubject val subject: Int) : LiveData<InAppEvent>() {
+class EventLiveData(val subject: Int) : LiveData<InAppEvent>() {
 
     fun update(inAppEvent: InAppEvent) {
         postValue(inAppEvent)
@@ -14,7 +14,7 @@ class EventLiveData(@EventSubject val subject: Int) : LiveData<InAppEvent>() {
 
     override fun removeObservers(owner: LifecycleOwner) {
         super.removeObservers(owner)
-        if(hasObservers().not())
+        if (hasObservers().not())
             EventBus.unsubscribe(subject)
     }
 }

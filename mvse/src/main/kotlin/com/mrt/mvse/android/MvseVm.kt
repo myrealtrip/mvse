@@ -97,6 +97,13 @@ abstract class MvseVm<S : MvseState, E : MvseEvent, SE : MvseSideEffect> : ViewM
         } else {
             Mvse.log("Intent was not MvseEvent")
         }
+
+        linkedVms()?.let {
+            for (vm in it) {
+                if(vm.isValidEvent(event))
+                    vm.intent(event)
+            }
+        }
     }
 
     protected fun mainThread(block: suspend () -> Unit) {
@@ -151,4 +158,7 @@ abstract class MvseVm<S : MvseState, E : MvseEvent, SE : MvseSideEffect> : ViewM
     open fun onSubscribe(inAppEvent: InAppEvent) {
     }
 
+    open fun linkedVms(): Array<MvseVm<MvseState, MvseEvent, MvseSideEffect>>? {
+        return null
+    }
 }
