@@ -20,10 +20,10 @@ class BoxBlueprintBuilder<STATE : BoxState, EVENT : BoxEvent, WORK : BoxWork>(va
     }
 
     inline fun <reified E : EVENT> on(
-            noinline createTo: STATE.(E) -> BoxBlueprint.To<STATE, WORK>
+            noinline to: STATE.(E) -> BoxBlueprint.To<STATE, WORK>
     ) {
         outputs[BoxKey<EVENT, E>(E::class.java)] = { state, event ->
-            createTo(state, event as E)
+            to(state, event as E)
         }
     }
 

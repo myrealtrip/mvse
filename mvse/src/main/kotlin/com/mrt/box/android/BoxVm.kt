@@ -151,6 +151,9 @@ abstract class BoxVm<S : BoxState, E : BoxEvent, SE : BoxWork> : ViewModel(),
     open fun onActivityResult(activity: BoxActivity<S, E, SE>, requestCode: Int, resultCode: Int, data: Intent?) {
     }
 
+    open fun onNewIntent(intent: Intent?) {
+    }
+
     open fun subjects(): Array<Int>? {
         return null
     }

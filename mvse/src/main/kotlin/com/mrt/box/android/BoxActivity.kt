@@ -76,6 +76,11 @@ abstract class BoxActivity<S : BoxState, E : BoxEvent, SE : BoxWork> : AppCompat
         return this
     }
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        vm?.onNewIntent(intent)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         vm?.onActivityResult(this, requestCode, resultCode, data)
