@@ -3,7 +3,7 @@
     <data>
         <variable
             name="vm"
-            type="com.mrt.mvse.core.Vm" />
+            type="com.mrt.box.core.Vm" />
     </data>
 
     <FrameLayout
