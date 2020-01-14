@@ -1,0 +1,46 @@
+package com.mrt.box.core
+
+import kotlinx.coroutines.Deferred
+
+class BoxBlueprintBuilder<STATE : BoxState, EVENT : BoxEvent, WORK : BoxWork>(val initialState: STATE) {
+    val outputs = mutableMapOf<BoxKey<EVENT, EVENT>, (STATE, EVENT) -> BoxBlueprint.To<STATE, WORK>>()
+    val heavyWorks = mutableMapOf<BoxKey<WORK, WORK>, suspend (BoxOutput.Valid<STATE, EVENT, WORK>) -> Deferred<Any?>?>()
+    val lightWorks = mutableMapOf<BoxKey<WORK, WORK>, (BoxOutput.Valid<STATE, EVENT, WORK>) -> Any?>()
+
+    inline fun <reified W : WORK> workInBackground(
+            noinline init: suspend (BoxOutput.Valid<STATE, EVENT, W>) -> Deferred<Any?>?
+    ) {
+        heavyWorks[BoxKey<WORK, W>(W::class.java)] = init as (suspend (BoxOutput.Valid<STATE, EVENT, WORK>) -> Deferred<Any?>)
+    }
+
+    inline fun <reified W : WORK> work(
+            noinline init: (BoxOutput.Valid<STATE, EVENT, W>) -> Any?
+    ) {
+        lightWorks[BoxKey<WORK, W>(W::class.java)] = init as (BoxOutput.Valid<STATE, EVENT, WORK>) -> Any?
+    }
+
+    inline fun <reified E : EVENT> on(
+            noinline createTo: STATE.(E) -> BoxBlueprint.To<STATE, WORK>
+    ) {
+        outputs[BoxKey<EVENT, E>(E::class.java)] = { state, event ->
+            createTo(state, event as E)
+        }
+    }
+
+    @Suppress("UNUSED") // The unused warning is probably a compiler bug.
+    fun STATE.toBe(state: STATE, work: WORK? = null) = BoxBlueprint.To(state, work
+            ?: BoxVoidWork as WORK)
+
+    @Suppress("UNUSED") // The unused warning is probably a compiler bug.
+    fun STATE.toBeNothing(work: WORK? = null) = toBe(this, work)
+
+    fun build(): BoxBlueprint<STATE, EVENT, WORK> {
+        return BoxBlueprint(
+                initialState,
+                outputs.toMap(),
+                heavyWorks.toMap(),
+                lightWorks.toMap()
+        )
+    }
+
+}

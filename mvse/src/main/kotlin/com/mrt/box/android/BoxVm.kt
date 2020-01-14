@@ -35,12 +35,12 @@ abstract class BoxVm<S : BoxState, E : BoxEvent, SE : BoxWork> : ViewModel(),
         get() = Dispatchers.Main + identifier
 
     private fun model(event: E) {
-        val transition: BoxTransition<S, E, SE> = bluePrint.reduce(stateInternal, event)
-        Box.log("Intent was $transition")
-        if (transition is BoxTransition.Valid) {
-            stateInternal = transition.to
+        val output: BoxOutput<S, E, SE> = bluePrint.boxing(stateInternal, event)
+        Box.log("Intent was $output")
+        if (output is BoxOutput.Valid) {
+            stateInternal = output.to
             view(stateInternal)
-            transition.work?.let { sideEffect ->
+            output.work?.let { sideEffect ->
                 Box.log("Transition has side effect $sideEffect")
                 var result: Any? = null
                 var doInBackground = false
@@ -58,7 +58,7 @@ abstract class BoxVm<S : BoxState, E : BoxEvent, SE : BoxWork> : ViewModel(),
                         val toDo = bluePrint.findBackgroundWork(sideEffect) ?: return@model
                         Box.log("Do in Background: $sideEffect")
                         workThread {
-                            result = toDo(transition)?.await()
+                            result = toDo(output)?.await()
                             Box.log("Result is $result for $sideEffect")
                             handleResult(result)
                         }
@@ -66,7 +66,7 @@ abstract class BoxVm<S : BoxState, E : BoxEvent, SE : BoxWork> : ViewModel(),
                     else -> {
                         val toDo = bluePrint.findForegroundWork((sideEffect)) ?: return@model
                         Box.log("Do in Foreground: $sideEffect")
-                        result = toDo(transition)
+                        result = toDo(output)
                         Box.log("Result is $result for $sideEffect")
                         handleResult(result)
                     }

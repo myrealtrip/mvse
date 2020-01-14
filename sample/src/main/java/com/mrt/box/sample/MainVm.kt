@@ -15,19 +15,19 @@ class MainVm : BoxVm<MainState, MainEvent, MainSideEffect>() {
             initialState(MainState.Count(2))
 
             state<MainState.Count> {
-                event<MainEvent.OnUpCount> {
+                on<MainEvent.OnUpCount> {
                     toBe(copy(count = count + 1))
                 }
-                event<MainEvent.OnClick> {
+                on<MainEvent.OnClick> {
                     toBe(copy(count = count + 1))
                 }
-                event<MainEvent.OnLongClick> {
+                on<MainEvent.OnLongClick> {
                     toBe(MainState.Clean)
                 }
-                event<MainEvent.OnClickLayout> {
+                on<MainEvent.OnClickLayout> {
                     toBe(copy(), MainSideEffect.AutoCountUp(3))
                 }
-                event<MainEvent.OnClickFinish> {
+                on<MainEvent.OnClickFinish> {
                     toBeNothing(MainSideEffect.Finish {
                         it.activity.finish()
                     })
@@ -35,7 +35,7 @@ class MainVm : BoxVm<MainState, MainEvent, MainSideEffect>() {
             }
 
             state<MainState.Clean> {
-                event<MainEvent.OnFinishedCleaning> {
+                on<MainEvent.OnFinishedCleaning> {
                     toBe(MainState.Count(0))
                 }
             }
