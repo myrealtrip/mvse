@@ -1,5 +1,6 @@
 package com.mrt.box.android
 
+import androidx.databinding.ViewDataBinding
 import com.mrt.box.core.BoxEvent
 import com.mrt.box.core.BoxState
 import com.mrt.box.core.BoxView
@@ -10,4 +11,5 @@ import com.mrt.box.core.Vm
  */
 interface BoxViewInitializer<S : BoxState, E : BoxEvent> {
     fun initializeView(v: BoxView<S, E>, vm: Vm?)
+    fun <B : ViewDataBinding, VM : Vm> bindingVm(b: B?, vm: VM)
 }

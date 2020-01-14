@@ -7,7 +7,10 @@ import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.Observer
 import com.mrt.box.android.event.InAppEvent
-import com.mrt.box.core.*
+import com.mrt.box.core.BoxEvent
+import com.mrt.box.core.BoxState
+import com.mrt.box.core.BoxView
+import com.mrt.box.core.BoxWork
 import com.mrt.v12.event.EventBus
 
 /**
@@ -28,8 +31,6 @@ abstract class BoxActivity<S : BoxState, E : BoxEvent, SE : BoxWork> : AppCompat
 
     abstract val vm: BoxVm<S, E, SE>?
 
-    abstract fun <B : ViewDataBinding, VM : Vm> bindingVm(b: B?, vm: VM)
-
     override val binding: ViewDataBinding? by lazy {
         if (layout > 0) DataBindingUtil.setContentView<ViewDataBinding>(this, layout) else null
     }
@@ -42,8 +43,8 @@ abstract class BoxActivity<S : BoxState, E : BoxEvent, SE : BoxWork> : AppCompat
         preOnCreate(savedInstanceState)
         vm?.let {
             binding?.lifecycleOwner = this
-            bindingVm(binding, it)
             it.bind(this@BoxActivity)
+            viewInitializer?.bindingVm(binding, it)
         }
         viewInitializer?.initializeView(this, vm)
 
