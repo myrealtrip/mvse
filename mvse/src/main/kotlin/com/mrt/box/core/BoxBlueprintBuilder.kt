@@ -28,11 +28,11 @@ class BoxBlueprintBuilder<STATE : BoxState, EVENT : BoxEvent, WORK : BoxWork>(va
     }
 
     @Suppress("UNUSED") // The unused warning is probably a compiler bug.
-    fun STATE.toBe(state: STATE, work: WORK? = null) = BoxBlueprint.To(state, work
+    fun STATE.to(state: STATE, work: WORK? = null) = BoxBlueprint.To(state, work
             ?: BoxVoidWork as WORK)
 
     @Suppress("UNUSED") // The unused warning is probably a compiler bug.
-    fun STATE.toBeNothing(work: WORK? = null) = toBe(this, work)
+    fun STATE.to(work: WORK? = null) = this@to.to(this, work)
 
     fun build(): BoxBlueprint<STATE, EVENT, WORK> {
         return BoxBlueprint(
