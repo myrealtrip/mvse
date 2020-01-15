@@ -11,13 +11,13 @@ class BoxBlueprint<S : BoxState, E : BoxEvent, W : BoxWork>(
         private val heavyWorks: Map<BoxKey<W, W>, suspend (BoxOutput.Valid<S, E, W>) -> Deferred<Any?>?>,
         private val lightWorks: Map<BoxKey<W, W>, (BoxOutput.Valid<S, E, W>) -> Any?>
 ) {
-    internal fun boxing(state: S, event: E): BoxOutput<S, E, W> {
+    internal fun reduce(state: S, event: E): BoxOutput<S, E, W> {
         return synchronized(this) {
             state.toOutput(event)
         }
     }
 
-    internal fun findBackgroundWork(work: W): (suspend (BoxOutput.Valid<S, E, W>) -> Deferred<Any?>?)? {
+    internal fun getHeavyWorkOrNull(work: W): (suspend (BoxOutput.Valid<S, E, W>) -> Deferred<Any?>?)? {
         return synchronized(this) {
             heavyWorks.filter { it.key.check(work) }
                     .map { it.value }
@@ -25,7 +25,7 @@ class BoxBlueprint<S : BoxState, E : BoxEvent, W : BoxWork>(
         }
     }
 
-    internal fun findForegroundWork(work: W): ((BoxOutput.Valid<S, E, W>) -> Any?)? {
+    internal fun getWorkOrNull(work: W): ((BoxOutput.Valid<S, E, W>) -> Any?)? {
         return synchronized(this) {
             lightWorks
                     .filter { it.key.check(work) }

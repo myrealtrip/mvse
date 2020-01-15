@@ -35,7 +35,7 @@ abstract class BoxVm<S : BoxState, E : BoxEvent, SE : BoxWork> : ViewModel(),
         get() = Dispatchers.Main + identifier
 
     private fun model(event: E) {
-        val output: BoxOutput<S, E, SE> = bluePrint.boxing(stateInternal, event)
+        val output: BoxOutput<S, E, SE> = bluePrint.reduce(stateInternal, event)
         Box.log("Intent was $output")
         if (output is BoxOutput.Valid) {
             stateInternal = output.to
@@ -43,19 +43,19 @@ abstract class BoxVm<S : BoxState, E : BoxEvent, SE : BoxWork> : ViewModel(),
             output.work?.let { sideEffect ->
                 Box.log("Transition has side effect $sideEffect")
                 var result: Any? = null
-                var doInBackground = false
-                var toDo: Any? = bluePrint.findForegroundWork(sideEffect)
+                var isHeavyWork = false
+                var toDo: Any? = bluePrint.getWorkOrNull(sideEffect)
                 if (toDo == null) {
-                    toDo = bluePrint.findBackgroundWork(sideEffect)
+                    toDo = bluePrint.getHeavyWorkOrNull(sideEffect)
 
                     if (toDo == null)
                         return@model
                     else
-                        doInBackground = true
+                        isHeavyWork = true
                 }
-                when (doInBackground) {
+                when (isHeavyWork) {
                     true -> {
-                        val toDo = bluePrint.findBackgroundWork(sideEffect) ?: return@model
+                        val toDo = bluePrint.getHeavyWorkOrNull(sideEffect) ?: return@model
                         Box.log("Do in Background: $sideEffect")
                         workThread {
                             result = toDo(output)?.await()
@@ -64,7 +64,7 @@ abstract class BoxVm<S : BoxState, E : BoxEvent, SE : BoxWork> : ViewModel(),
                         }
                     }
                     else -> {
-                        val toDo = bluePrint.findForegroundWork((sideEffect)) ?: return@model
+                        val toDo = bluePrint.getWorkOrNull((sideEffect)) ?: return@model
                         Box.log("Do in Foreground: $sideEffect")
                         result = toDo(output)
                         Box.log("Result is $result for $sideEffect")
