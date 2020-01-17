@@ -1,6 +1,7 @@
 package com.mrt.box.android
 
 import android.content.Intent
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -148,10 +149,16 @@ abstract class BoxVm<S : BoxState, E : BoxEvent, SE : BoxWork> : ViewModel(),
         }
     }
 
-    open fun onActivityResult(activity: BoxActivity<S, E, SE>, requestCode: Int, resultCode: Int, data: Intent?) {
+    open fun onActivityResult(activity: AppCompatActivity, requestCode: Int, resultCode: Int, data: Intent?) {
+        linkedVms()?.forEach {
+            it.onActivityResult(activity, requestCode, resultCode, data)
+        }
     }
 
     open fun onNewIntent(intent: Intent?) {
+        linkedVms()?.forEach {
+            it.onNewIntent(intent)
+        }
     }
 
     open fun subjects(): Array<Int>? {
