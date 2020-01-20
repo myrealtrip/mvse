@@ -28,6 +28,8 @@ abstract class BoxVm<S : BoxState, E : BoxEvent, SE : BoxWork> : ViewModel(),
     protected val state: S
         get() = stateInternal
 
+    protected var parentState: BoxState? = null
+
     private val stateLiveData = MutableLiveData<BoxState>()
     private val identifier = Job()
     private val jobs = mutableListOf<Job>()
@@ -101,8 +103,10 @@ abstract class BoxVm<S : BoxState, E : BoxEvent, SE : BoxWork> : ViewModel(),
 
         linkedVms()?.let {
             for (vm in it) {
-                if(vm.isValidEvent(event))
+                vm.parentState = state
+                if (vm.isValidEvent(event)) {
                     vm.intent(event)
+                }
             }
         }
     }

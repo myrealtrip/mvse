@@ -41,7 +41,7 @@ class BoxBlueprint<S : BoxState, E : BoxEvent, W : BoxWork>(
                 return BoxOutput.Valid(this, event, toState, work)
             }
         }
-        return BoxOutput.Invalid(this, event)
+        return BoxOutput.Void(this, event)
     }
 
     data class To<out STATE : BoxState, out WORK : BoxWork> internal constructor(

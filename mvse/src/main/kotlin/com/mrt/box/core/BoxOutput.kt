@@ -11,7 +11,7 @@ sealed class BoxOutput<out STATE : BoxState, out EVENT : BoxEvent, out WORK : Bo
             val work: WORK
     ) : BoxOutput<STATE, EVENT, WORK>()
 
-    data class Invalid<out STATE : BoxState, out EVENT : BoxEvent, out WORK : BoxWork>(
+    data class Void<out STATE : BoxState, out EVENT : BoxEvent, out WORK : BoxWork>(
             override val from: STATE,
             override val event: EVENT
     ) : BoxOutput<STATE, EVENT, WORK>()
