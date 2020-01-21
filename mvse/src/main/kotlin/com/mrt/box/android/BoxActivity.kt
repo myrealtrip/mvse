@@ -7,10 +7,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.Observer
 import com.mrt.box.android.event.InAppEvent
-import com.mrt.box.core.BoxEvent
-import com.mrt.box.core.BoxState
-import com.mrt.box.core.BoxView
-import com.mrt.box.core.BoxWork
+import com.mrt.box.core.*
 import com.mrt.v12.event.EventBus
 
 /**
@@ -50,9 +47,20 @@ abstract class BoxActivity<S : BoxState, E : BoxEvent, SE : BoxWork> : AppCompat
 
         subjects()?.let { subjects ->
             subjects.forEach {
+                Box.log("$this register subscribed $it")
                 EventBus.subscribe(it, this@BoxActivity, Observer { inAppEvent ->
                     onSubscribe(inAppEvent)
                 })
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        subjects()?.let { subjects ->
+            subjects.forEach {
+                Box.log("$this remove subscribed $it")
+                EventBus.unsubscribe(it)
             }
         }
     }

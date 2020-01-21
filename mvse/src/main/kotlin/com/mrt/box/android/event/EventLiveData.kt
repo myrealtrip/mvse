@@ -9,7 +9,7 @@ import com.mrt.box.android.event.InAppEvent
  */
 class EventLiveData(val subject: Int) : LiveData<InAppEvent>() {
 
-    fun update(inAppEvent: InAppEvent) {
+    fun update(inAppEvent: InAppEvent?) {
         postValue(inAppEvent)
     }
 
