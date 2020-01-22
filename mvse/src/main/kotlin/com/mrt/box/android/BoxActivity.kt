@@ -5,10 +5,10 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
-import androidx.lifecycle.Observer
 import com.mrt.box.android.event.InAppEvent
+import com.mrt.box.android.event.event.BoxInAppEvent.asChannel
 import com.mrt.box.core.*
-import com.mrt.v12.event.EventBus
+import kotlinx.coroutines.launch
 
 /**
  * Created by jaehochoe on 2020-01-03.
@@ -45,22 +45,15 @@ abstract class BoxActivity<S : BoxState, E : BoxEvent, SE : BoxWork> : AppCompat
         }
         viewInitializer?.initializeView(this, vm)
 
-        subjects()?.let { subjects ->
-            subjects.forEach {
-                Box.log("$this register subscribed $it")
-                EventBus.subscribe(it, this@BoxActivity, Observer { inAppEvent ->
+        vm?.launch {
+            val channel = asChannel<InAppEvent>()
+            var isNeedSkipFirstEvent = channel.isEmpty.not()
+            for (inAppEvent in channel) {
+                if(isNeedSkipFirstEvent.not()) {
+                    Box.log("InAppEvent = $inAppEvent in ${this@BoxActivity}")
                     onSubscribe(inAppEvent)
-                })
-            }
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        subjects()?.let { subjects ->
-            subjects.forEach {
-                Box.log("$this remove subscribed $it")
-                EventBus.unsubscribe(it)
+                } else
+                    isNeedSkipFirstEvent = false
             }
         }
     }
