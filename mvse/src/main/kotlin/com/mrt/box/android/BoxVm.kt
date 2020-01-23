@@ -8,6 +8,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import com.mrt.box.android.event.InAppEvent
 import com.mrt.box.core.*
+import com.mrt.box.isValidEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -131,7 +132,7 @@ abstract class BoxVm<S : BoxState, E : BoxEvent, SE : BoxWork> : ViewModel(),
         jobs.add(job)
     }
 
-    fun <V : BoxView<S, E>> bind(view: V) {
+    fun <V : BoxAndroidView<S, E>> bind(view: V) {
         if (view is LifecycleOwner) {
             stateLiveData.observe(view, Observer {
                 Box.log("View will view by $it")
@@ -163,10 +164,6 @@ abstract class BoxVm<S : BoxState, E : BoxEvent, SE : BoxWork> : ViewModel(),
         linkedVms()?.forEach {
             it.onNewIntent(intent)
         }
-    }
-
-    open fun subjects(): Array<Int>? {
-        return null
     }
 
     open fun onSubscribe(inAppEvent: InAppEvent) {

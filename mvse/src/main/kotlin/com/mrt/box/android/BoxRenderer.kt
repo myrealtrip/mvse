@@ -2,7 +2,6 @@ package com.mrt.box.android
 
 import com.mrt.box.core.BoxEvent
 import com.mrt.box.core.BoxState
-import com.mrt.box.core.BoxView
 import com.mrt.box.core.Vm
 
 /**
@@ -10,7 +9,7 @@ import com.mrt.box.core.Vm
  */
 interface BoxRenderer<S : BoxState, E : BoxEvent> {
     fun render(
-            v: BoxView<S, E>,
+            v: BoxAndroidView<S, E>,
             s: S,
             vm: Vm?
     )

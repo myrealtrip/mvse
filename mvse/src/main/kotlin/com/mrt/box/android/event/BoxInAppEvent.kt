@@ -10,17 +10,6 @@ import kotlinx.coroutines.launch
 /**
  * Created by jaehochoe on 2019-09-26.
  */
-
-/**
- * You can use like this.
- * val channel = EventBus().asChannel<ItemChangeAction>()
- * launch (UI){
- *   for(action in channel){
- *     // You can use item
- *     action.item
- *   }
- * }
- */
 object BoxInAppEvent {
     val bus: BroadcastChannel<InAppEvent> = ConflatedBroadcastChannel()
 

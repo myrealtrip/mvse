@@ -8,14 +8,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
+import com.mrt.box.android.event.InAppEvent
+import com.mrt.box.android.event.event.BoxInAppEvent
 import com.mrt.box.core.*
+import kotlinx.coroutines.launch
 
 
 /**
  * Created by jaehochoe on 2020-01-03.
  */
 abstract class BoxFragment<S : BoxState, E : BoxEvent, SE : BoxWork> : Fragment(),
-    BoxView<S, E> {
+        BoxAndroidView<S, E> {
 
     abstract val isNeedLazyLoading: Boolean
     private var isBound = false
@@ -40,7 +43,11 @@ abstract class BoxFragment<S : BoxState, E : BoxEvent, SE : BoxWork> : Fragment(
 
     override val binding: ViewDataBinding? by lazyOf(bindingTemp)
 
+    open fun preOnCreateView(savedInstanceState: Bundle?) {
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        preOnCreateView(savedInstanceState)
         return if (layout > 0) {
             bindingTemp = DataBindingUtil.inflate(inflater, layout, container, false)
             binding?.lifecycleOwner = this
@@ -49,6 +56,17 @@ abstract class BoxFragment<S : BoxState, E : BoxEvent, SE : BoxWork> : Fragment(
                 if(isNeedLazyLoading.not()) {
                     it?.bind(this@BoxFragment)
                     isBound = true
+                }
+                it.launch {
+                    val channel = BoxInAppEvent.asChannel<InAppEvent>()
+                    var isNeedSkipFirstEvent = channel.isEmpty.not()
+                    for (inAppEvent in channel) {
+                        if(isNeedSkipFirstEvent.not()) {
+                            Box.log("InAppEvent = $inAppEvent in ${this@BoxFragment}")
+                            onSubscribe(inAppEvent)
+                        } else
+                            isNeedSkipFirstEvent = false
+                    }
                 }
             }
             viewInitializer?.initializeView(this, vm)
@@ -85,5 +103,9 @@ abstract class BoxFragment<S : BoxState, E : BoxEvent, SE : BoxWork> : Fragment(
             error("AppCompatActivity is required")
 
         return activity as AppCompatActivity
+    }
+
+    private fun onSubscribe(inAppEvent: InAppEvent) {
+        vm?.onSubscribe(inAppEvent)
     }
 }

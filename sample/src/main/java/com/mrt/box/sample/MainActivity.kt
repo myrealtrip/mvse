@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.mrt.box.android.BoxActivity
 import com.mrt.box.android.BoxRenderer
 import com.mrt.box.core.Vm
-import com.mrt.box.core.be
+import com.mrt.box.be
 import com.mrt.box.sample.databinding.ActivityMainBinding
 
 class MainActivity : BoxActivity<MainState, MainEvent, MainSideEffect>() {

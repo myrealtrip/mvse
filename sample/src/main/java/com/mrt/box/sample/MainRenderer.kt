@@ -2,6 +2,7 @@ package com.mrt.box.sample
 
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import com.mrt.box.android.BoxAndroidView
 import com.mrt.box.android.BoxRenderer
 import com.mrt.box.core.*
 import com.mrt.box.sample.databinding.ActivityMainBinding
@@ -11,7 +12,7 @@ import com.mrt.box.sample.databinding.ActivityMainBinding
  */
 class MainRenderer : BoxRenderer {
     override fun <S : BoxState, E : BoxEvent> render(
-            view: BoxView<S, E>,
+            view: BoxAndroidView<S, E>,
             state: BoxState,
             vm: Vm?
     ) {

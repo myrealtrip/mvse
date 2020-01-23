@@ -1,7 +1,11 @@
 package com.mrt.box.core
 
+import com.mrt.box.core.internal.BoxKey
 import kotlinx.coroutines.Deferred
 
+/**
+ * Created by jaehochoe on 2020-01-01.
+ */
 class BoxBlueprintBuilder<STATE : BoxState, EVENT : BoxEvent, WORK : BoxWork>(val initialState: STATE) {
     val outputs = mutableMapOf<BoxKey<EVENT, EVENT>, (STATE, EVENT) -> BoxBlueprint.To<STATE, WORK>>()
     val heavyWorks = mutableMapOf<BoxKey<WORK, WORK>, suspend (BoxOutput.Valid<STATE, EVENT, WORK>) -> Deferred<Any?>?>()
