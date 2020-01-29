@@ -172,4 +172,12 @@ abstract class BoxVm<S : BoxState, E : BoxEvent, SE : BoxWork> : ViewModel(),
     open fun linkedVms(): Array<BoxVm<BoxState, BoxEvent, BoxWork>>? {
         return null
     }
+
+    protected inline fun applyState(changes: S.() -> Unit): S {
+        return newState()?.apply(changes) ?: throw Exception("newState() must be not null")
+    }
+
+    open fun newState() : S? {
+        return null
+    }
 }
